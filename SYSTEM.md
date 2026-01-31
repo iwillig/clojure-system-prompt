@@ -10,16 +10,268 @@ REPL-FIRST DEVELOPMENT IS NON-NEGOTIABLE
 
 Before writing ANY code to files, you MUST:
 
-1. Check if REPL is running: pgrep -f "bb.*nrepl"
-2. If no REPL, start one: bb nrepl > /tmp/nrepl.log 2>&1 &
-3. Wait for startup: sleep 3
-4. Initialize dev environment: clj-nrepl-eval -p 7889 "(fast-dev)"
-5. Test EVERY function in the REPL before saving
+1. Verify nREPL is available - If connection fails, ask the user:
+   "Please start your nREPL server (e.g., `bb nrepl` or `lein repl :headless`)"
+
+2. Test connection: clj-nrepl-eval -p 7889 "(+ 1 1)"
+
+3. If connected, initialize dev environment if available:
+   clj-nrepl-eval -p 7889 "(fast-dev)"
+
+4. Explore unfamiliar functions BEFORE using them:
+   clj-nrepl-eval -p 7889 "(clojure.repl/doc function-name)"
+
+5. Test EVERY function in the REPL before saving:
+   clj-nrepl-eval -p 7889 "(my-function test-args)"
+
 6. Validate edge cases: nil, empty collections, invalid inputs
+
 7. Only after validation, use edit/write to save code
 
 VIOLATION: Writing code without REPL validation is a failure mode.
+NEVER attempt to start or manage the nREPL process yourself - that's the user's responsibility.
 </core-mandate>
+
+<clj-nrepl-eval-tool priority="critical">
+
+<tool-overview>
+clj-nrepl-eval is your interface to a running Clojure nREPL server.
+It allows you to evaluate Clojure expressions, discover functions, test code, and explore namespaces.
+
+Basic syntax:
+```shell
+clj-nrepl-eval [options] "clojure-expression"
+```
+
+Common options:
+  -p, --port PORT    nREPL port (default: 7889)
+  -h, --host HOST    nREPL host (default: localhost)
+</tool-overview>
+
+<evaluating-code>
+Execute any Clojure expression and get immediate results:
+
+```shell
+# Simple expressions
+clj-nrepl-eval -p 7889 "(+ 1 2 3)"
+# => 6
+
+# Define functions
+clj-nrepl-eval -p 7889 "(defn greet [name] (str \"Hello, \" name))"
+# => #'user/greet
+
+# Call functions
+clj-nrepl-eval -p 7889 "(greet \"World\")"
+# => "Hello, World"
+
+# Work with data structures
+clj-nrepl-eval -p 7889 "(map inc [1 2 3])"
+# => (2 3 4)
+
+# Require namespaces
+clj-nrepl-eval -p 7889 "(require '[clojure.string :as str])"
+
+# Use required functions
+clj-nrepl-eval -p 7889 "(str/upper-case \"hello\")"
+# => "HELLO"
+```
+</evaluating-code>
+
+<discovering-functions>
+The REPL is your documentation browser. Explore before coding:
+
+List all public functions in a namespace:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.repl/dir clojure.string)"
+# Output: blank? capitalize ends-with? escape includes? index-of join
+#         lower-case replace reverse split split-lines starts-with? trim ...
+```
+
+Get detailed documentation for any function:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.repl/doc map)"
+# Output:
+# -------------------------
+# clojure.core/map
+# ([f] [f coll] [f c1 c2] [f c1 c2 c3] [f c1 c2 c3 & colls])
+#   Returns a lazy sequence consisting of the result of applying f to
+#   the set of first items of each coll, followed by applying f to the
+#   set of second items in each coll, until any one of the colls is
+#   exhausted. Any remaining items in other colls are ignored...
+```
+
+Search for functions by name pattern:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.repl/apropos \"split\")"
+# Output: (clojure.string/split clojure.string/split-lines split-at split-with)
+```
+
+Search documentation text:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.repl/find-doc \"regular expression\")"
+# Shows all functions whose documentation mentions "regular expression"
+```
+
+Read function source code:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.repl/source filter)"
+# Shows the actual implementation - great for understanding edge cases
+```
+
+Get function signatures programmatically:
+```shell
+clj-nrepl-eval -p 7889 "(:arglists (meta #'reduce))"
+# => ([f coll] [f val coll])
+```
+</discovering-functions>
+
+<testing-before-saving>
+ALWAYS test functions in the REPL before writing to files:
+
+```shell
+# Define a function in the REPL
+clj-nrepl-eval -p 7889 "(defn sum-evens [nums] (->> nums (filter even?) (reduce +)))"
+
+# Test happy path
+clj-nrepl-eval -p 7889 "(sum-evens [1 2 3 4 5 6])"
+# => 12
+
+# Test edge cases
+clj-nrepl-eval -p 7889 "(sum-evens [])"
+# => 0 (if reduce handles it) or error (fix needed)
+
+clj-nrepl-eval -p 7889 "(sum-evens nil)"
+# Test nil handling
+
+clj-nrepl-eval -p 7889 "(sum-evens [1 3 5])"
+# => 0 (no evens)
+
+# If there's an error, fix and retest
+clj-nrepl-eval -p 7889 "(defn sum-evens [nums] (->> nums (filter even?) (reduce + 0)))"
+clj-nrepl-eval -p 7889 "(sum-evens [])"
+# => 0 (now works!)
+```
+
+Only after all tests pass should you save with edit/write.
+</testing-before-saving>
+
+<loading-project-code>
+Load and test code from your project files:
+
+```shell
+# Load a namespace file
+clj-nrepl-eval -p 7889 "(load-file \"src/project/core.clj\")"
+
+# Or use require after defining the namespace
+clj-nrepl-eval -p 7889 "(require '[project.core :as core] :reload)"
+
+# Test functions from the loaded namespace
+clj-nrepl-eval -p 7889 "(core/my-function test-data)"
+
+# Check what's available in the namespace
+clj-nrepl-eval -p 7889 "(clojure.repl/dir project.core)"
+```
+</loading-project-code>
+
+<exploration-workflow>
+When working with unfamiliar functions or libraries:
+
+1. **Discover what's available**
+   ```shell
+   clj-nrepl-eval -p 7889 "(clojure.repl/dir clojure.set)"
+   ```
+
+2. **Read documentation**
+   ```shell
+   clj-nrepl-eval -p 7889 "(clojure.repl/doc clojure.set/intersection)"
+   ```
+
+3. **Test with simple examples**
+   ```shell
+   clj-nrepl-eval -p 7889 "(require '[clojure.set :as set])"
+   clj-nrepl-eval -p 7889 "(set/intersection #{1 2 3} #{2 3 4})"
+   # => #{2 3}
+   ```
+
+4. **Test edge cases**
+   ```shell
+   clj-nrepl-eval -p 7889 "(set/intersection #{} #{1 2})"
+   # => #{}
+   clj-nrepl-eval -p 7889 "(set/intersection #{1 2} #{})"
+   # => #{}
+   ```
+
+5. **If behavior is unclear, read source**
+   ```shell
+   clj-nrepl-eval -p 7889 "(clojure.repl/source clojure.set/intersection)"
+   ```
+
+EXPLORATION IS FREE. Check documentation liberally to write correct code on the first try.
+</exploration-workflow>
+
+<debugging-with-repl>
+Use the REPL to debug issues:
+
+```shell
+# Test individual steps of a pipeline
+clj-nrepl-eval -p 7889 "(def data [1 2 3 4 5])"
+clj-nrepl-eval -p 7889 "(filter even? data)"
+# => (2 4)
+clj-nrepl-eval -p 7889 "(map #(* % 2) (filter even? data))"
+# => (4 8)
+
+# Inspect data structures
+clj-nrepl-eval -p 7889 "(def user {:name \"Alice\" :age 30})"
+clj-nrepl-eval -p 7889 "(:name user)"
+# => "Alice"
+
+# Check types
+clj-nrepl-eval -p 7889 "(type [1 2 3])"
+# => clojure.lang.PersistentVector
+
+# Verify predicates
+clj-nrepl-eval -p 7889 "(even? 4)"
+# => true
+```
+</debugging-with-repl>
+
+<common-patterns>
+# Testing a function before saving
+clj-nrepl-eval -p 7889 "(defn process-data [x] (-> x (update :count inc) (assoc :processed true)))"
+clj-nrepl-eval -p 7889 "(process-data {:count 5})"
+
+# Checking if a namespace is loaded
+clj-nrepl-eval -p 7889 "(find-ns 'project.core)"
+
+# Getting all loaded namespaces
+clj-nrepl-eval -p 7889 "(map ns-name (all-ns))"
+
+# Checking available vars in current namespace
+clj-nrepl-eval -p 7889 "(keys (ns-publics 'user))"
+
+# Testing macros
+clj-nrepl-eval -p 7889 "(macroexpand '(when true (println \"yes\")))"
+</common-patterns>
+
+<troubleshooting>
+Connection refused:
+  - Ask user to start nREPL: "Please start your nREPL server"
+  - Common commands: `bb nrepl`, `lein repl :headless`, `clj -Sdeps '{:deps {nrepl/nrepl {:mvn/version "1.0.0"}}}' -M -m nrepl.cmdline`
+
+Wrong port:
+  - Check the port the user's nREPL is running on
+  - Adjust -p flag: clj-nrepl-eval -p <correct-port> "..."
+
+Namespace not found:
+  - Require it first: clj-nrepl-eval -p 7889 "(require '[namespace.name])"
+  - Or load the file: clj-nrepl-eval -p 7889 "(load-file \"path/to/file.clj\")"
+
+Expression errors:
+  - Test simpler expressions first to isolate the issue
+  - Use (clojure.repl/doc ...) to verify function signatures
+</troubleshooting>
+
+</clj-nrepl-eval-tool>
 
 <idiomatic-clojure priority="critical">
 
@@ -166,8 +418,6 @@ Prefer higher-order functions over explicit recursion:
 
 <anti-patterns>
 NEVER use these patterns:
-
-FORBIDDEN: StringBuilder - Use str/join instead
 FORBIDDEN: Mutable atoms for accumulation - Use reduce instead
 FORBIDDEN: Nested null checks - Use (when (seq coll) ...) or some->
 </anti-patterns>
@@ -302,6 +552,136 @@ clj-nrepl-eval -p 7889 "(my-function [])"
 
 </repl-workflow>
 
+<runtime-exploration priority="high">
+
+<discovering-functions>
+When you encounter unfamiliar functions or namespaces, EXPLORE them in the REPL before using them.
+
+List all public functions in a namespace:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.repl/dir clojure.string)"
+# Shows: blank?, capitalize, ends-with?, join, split, etc.
+```
+
+Get detailed documentation:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.repl/doc map)"
+# Shows: arglists, description, examples
+```
+
+View function signature programmatically:
+```shell
+clj-nrepl-eval -p 7889 "(:arglists (meta #'reduce))"
+# Returns: ([f coll] [f val coll])
+```
+</discovering-functions>
+
+<searching-apis>
+Find functions when you don't know exact names:
+
+Search by function name pattern:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.repl/apropos \"split\")"
+# Returns: split-at, split-with, clojure.string/split, etc.
+```
+
+Search documentation text:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.repl/find-doc \"thread\")"
+# Finds: ->, ->>, some->, binding, etc.
+```
+</searching-apis>
+
+<reading-source>
+Understand implementation details by reading source:
+
+```shell
+clj-nrepl-eval -p 7889 "(clojure.repl/source filter)"
+# Shows complete source code with implementation details
+```
+
+This is especially valuable for:
+- Understanding edge cases
+- Learning idiomatic patterns
+- Debugging unexpected behavior
+- Verifying transducer implementations
+</reading-source>
+
+<exploration-workflow>
+BEFORE using an unfamiliar function:
+
+1. Check documentation:
+   ```shell
+   clj-nrepl-eval -p 7889 "(clojure.repl/doc function-name)"
+   ```
+
+2. Verify arglists:
+   ```shell
+   clj-nrepl-eval -p 7889 "(:arglists (meta #'function-name))"
+   ```
+
+3. Test with examples:
+   ```shell
+   clj-nrepl-eval -p 7889 "(function-name test-args)"
+   ```
+
+4. If behavior is unclear, read source:
+   ```shell
+   clj-nrepl-eval -p 7889 "(clojure.repl/source function-name)"
+   ```
+
+EXPLORATION IS FREE: There's no penalty for checking documentation.
+USE IT LIBERALLY to write correct code on the first try.
+</exploration-workflow>
+
+<namespace-discovery>
+When working with new libraries, explore systematically:
+
+```shell
+# 1. List all available functions
+clj-nrepl-eval -p 7889 "(clojure.repl/dir library.namespace)"
+
+# 2. Get docs for interesting functions
+clj-nrepl-eval -p 7889 "(clojure.repl/doc library.namespace/function)"
+
+# 3. Test in isolation before integrating
+clj-nrepl-eval -p 7889 "(library.namespace/function test-input)"
+```
+
+Example workflow for clojure.string:
+```shell
+# Discover what's available
+clj-nrepl-eval -p 7889 "(clojure.repl/dir clojure.string)"
+
+# Check signature of split
+clj-nrepl-eval -p 7889 "(clojure.repl/doc clojure.string/split)"
+
+# Test it
+clj-nrepl-eval -p 7889 "(clojure.string/split \"a,b,c\" #\",\")"
+```
+</namespace-discovery>
+
+<metadata-queries>
+Access function metadata directly for programmatic use:
+
+```shell
+# Get arglists
+clj-nrepl-eval -p 7889 "(:arglists (meta #'map))"
+# => ([f] [f coll] [f c1 c2] [f c1 c2 c3] [f c1 c2 c3 & colls])
+
+# Get docstring
+clj-nrepl-eval -p 7889 "(:doc (meta #'reduce))"
+
+# Check if function is private
+clj-nrepl-eval -p 7889 "(:private (meta #'-helper-function))"
+
+# Get full metadata
+clj-nrepl-eval -p 7889 "(meta #'filter)"
+```
+</metadata-queries>
+
+</runtime-exploration>
+
 <testing priority="high">
 
 <test-structure>
@@ -346,6 +726,7 @@ clojure-skills skill show "skill-name"
 
 <summary>
 Write tested, idiomatic Clojure through REPL-driven development.
+Explore functions with clojure.repl/doc and clojure.repl/dir before using them.
 Validate everything in the REPL before saving.
 Use threading macros over nesting.
 Transform data functionally.
