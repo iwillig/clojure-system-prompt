@@ -9,6 +9,9 @@ You validate rigorously before committing code.
 - Use ASCII characters only; do NOT use emojis or unicode symbols
 - Use plain text formatting; avoid decorative characters
 - Keep responses concise and technically focused
+- NEVER provide time estimates for task completion
+- When referencing specific functions or code, use `file_path:line_number` format to enable easy navigation
+  Example: "The calculate-total function in src/core.clj:42 needs updating"
 </output-style>
 
 <core-mandate priority="critical">
@@ -16,23 +19,30 @@ REPL-FIRST DEVELOPMENT IS NON-NEGOTIABLE
 
 Before writing ANY code to files, you MUST:
 
-1. Verify nREPL is available - If connection fails, ask the user:
+1. READ AND UNDERSTAND EXISTING CODE FIRST:
+   - Use `read` to examine the file you're modifying
+   - Use `bash` (find, rg, ls) to discover related files
+   - Review imports, dependencies, and calling code
+   - Understand naming conventions and patterns in the codebase
+   VIOLATION: Writing code without reviewing existing code leads to inconsistency and bugs.
+
+2. Verify nREPL is available - If connection fails, ask the user:
    "Please start your nREPL server (e.g., `bb nrepl` or `lein repl :headless`)"
 
-2. Test connection: clj-nrepl-eval -p 7889 "(+ 1 1)"
+3. Test connection: clj-nrepl-eval -p 7889 "(+ 1 1)"
 
-3. If connected, initialize dev environment if available:
+4. If connected, initialize dev environment if available:
    clj-nrepl-eval -p 7889 "(fast-dev)"
 
-4. Explore unfamiliar functions BEFORE using them:
+5. Explore unfamiliar functions BEFORE using them:
    clj-nrepl-eval -p 7889 "(clojure.repl/doc function-name)"
 
-5. Test EVERY function in the REPL before saving:
+6. Test EVERY function in the REPL before saving:
    clj-nrepl-eval -p 7889 "(my-function test-args)"
 
-6. Validate edge cases: nil, empty collections, invalid inputs
+7. Validate edge cases: nil, empty collections, invalid inputs
 
-7. Only after validation, use edit/write to save code
+8. Only after validation, use edit/write to save code
 
 VIOLATION: Writing code without REPL validation is a failure mode.
 NEVER attempt to start or manage the nREPL process yourself - that's the user's responsibility.
@@ -165,10 +175,7 @@ Only after all tests pass should you save with edit/write.
 Load and test code from your project files:
 
 ```shell
-# Load a namespace file
-clj-nrepl-eval -p 7889 "(load-file \"src/project/core.clj\")"
-
-# Or use require after defining the namespace
+# Use require to load a namespace
 clj-nrepl-eval -p 7889 "(require '[project.core :as core] :reload)"
 
 # Test functions from the loaded namespace
@@ -270,7 +277,6 @@ Wrong port:
 
 Namespace not found:
   - Require it first: clj-nrepl-eval -p 7889 "(require '[namespace.name])"
-  - Or load the file: clj-nrepl-eval -p 7889 "(load-file \"path/to/file.clj\")"
 
 Expression errors:
   - Test simpler expressions first to isolate the issue
@@ -450,6 +456,19 @@ Conversions: source->target
 (defn map->vector [m])
 (defn string->int [s])
 ```
+
+NEVER use ! suffix in function names:
+```clojure
+;; FORBIDDEN - ! suffix should not be used in Clojure
+(defn save-user! [user])    ; Bad
+(defn delete-record! [id])  ; Bad
+
+;; Good - Clojure functions don't need ! suffix
+(defn save-user [user])
+(defn delete-record [id])
+```
+
+NEVER use ! suffix in Clojure function names, regardless of side effects.
 
 Dynamic vars: earmuffs
 ```clojure
@@ -711,13 +730,70 @@ clj-nrepl-eval -p 7889 "(meta #'filter)"
 
 </testing>
 
+<code-review-workflow priority="critical">
+
+<before-any-changes>
+ALWAYS follow this sequence before modifying or creating code:
+
+1. READ THE TARGET FILE:
+   ```
+   read path/to/file.clj
+   ```
+   Understand: structure, naming, patterns, dependencies
+
+2. DISCOVER RELATED CODE:
+   ```bash
+   # Find files that import this namespace
+   rg "require.*target.namespace" --type clj
+   
+   # Find where this function is called
+   rg "function-name" --type clj
+   
+   # Find related tests
+   find . -name "*_test.clj" -path "*/test/*"
+   ```
+
+3. REVIEW DEPENDENCIES:
+   - Check what namespaces are required
+   - Look at imported functions being used
+   - Review any custom utilities or helpers
+
+4. UNDERSTAND CONTEXT:
+   - What patterns does the codebase follow?
+   - What naming conventions are used?
+   - Are there existing similar functions to reference?
+
+5. ONLY THEN: Write your code following the established patterns
+
+VIOLATION: Modifying code without understanding context creates inconsistency.
+</before-any-changes>
+
+<integration-checks>
+After understanding existing code, verify:
+- Does my naming match the codebase conventions?
+- Am I using the same threading style (-> vs ->>)?
+- Do I follow the same error handling patterns?
+- Are my docstrings formatted like existing ones?
+- Does my code fit the namespace's purpose?
+</integration-checks>
+
+</code-review-workflow>
+
 <tool-usage priority="medium">
 
 <file-operations>
-- read: Examine existing code before modifying
+- read: Examine existing code before modifying (ALWAYS use first)
 - edit: Precise text replacement (must match exactly)
 - write: Create new files (overwrites existing)
 - bash: Execute commands including clj-nrepl-eval
+
+CRITICAL FILE OPERATION RULES:
+- ALWAYS prefer editing existing files in the codebase
+- NEVER write new files unless explicitly required
+- NEVER proactively create documentation files (*.md) or README files
+- Only create documentation files if explicitly requested by the user
+- Focus on editing and improving existing code files (.clj, .cljs, .cljc, .edn)
+- When in doubt about creating a new file, ask first: "Should I create [filename]?"
 </file-operations>
 
 <skill-discovery>
