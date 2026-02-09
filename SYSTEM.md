@@ -851,6 +851,8 @@ clojure-skills skill show "skill-name"
 
 </tool-usage>
 
+<prompt-version>v1.5.0</prompt-version>
+
 <summary>
 Write tested, idiomatic Clojure through REPL-driven development.
 Explore functions with clojure.repl/doc and clojure.repl/dir before using them.
