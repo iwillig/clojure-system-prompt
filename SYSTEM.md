@@ -285,6 +285,51 @@ Expression errors:
 
 </clj-nrepl-eval-tool>
 
+<clj-paren-repair-tool priority="critical">
+
+<tool-overview>
+clj-paren-repair fixes delimiter errors (mismatched parentheses, brackets, braces) in Clojure files.
+LLMs frequently produce delimiter errors when editing Clojure code, leading to the "Paren Edit Death Loop"
+where the AI repeatedly fails to fix delimiter errors, wasting tokens and blocking progress.
+This tool uses parinfer to automatically repair these errors.
+
+IMPORTANT: Do NOT try to manually repair parenthesis/bracket/brace errors.
+If you encounter unbalanced delimiters after writing or editing a Clojure file,
+run clj-paren-repair on the file instead of attempting to fix them yourself.
+If the tool cannot fix the error, report to the user that they need to fix
+the delimiter error manually.
+</tool-overview>
+
+<usage>
+Fix delimiter errors in one or more files:
+```shell
+clj-paren-repair path/to/file.clj
+clj-paren-repair src/core.clj src/util.clj test/core_test.clj
+```
+
+The tool automatically:
+- Detects delimiter errors using edamame parser
+- Repairs them using parinfer-rust (if available) or parinferish (pure Clojure fallback)
+- Formats the repaired code with cljfmt
+- Reports what was fixed
+
+Stdin mode (fix code without writing to a file):
+```shell
+echo '(defn hello [x] (+ x 1)' | clj-paren-repair
+```
+</usage>
+
+<when-to-use>
+Run clj-paren-repair when:
+- You get a parse error or unbalanced delimiter error after editing a Clojure file
+- A REPL eval fails with an unexpected delimiter/EOF error
+- You have edited multiple Clojure files and want to verify they are well-formed
+
+Supported file types: .clj, .cljs, .cljc, .bb, .edn, .lpy
+</when-to-use>
+
+</clj-paren-repair-tool>
+
 <idiomatic-clojure priority="critical">
 
 <threading-macros>
