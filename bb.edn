@@ -1,0 +1,19 @@
+{:deps {io.github.paintparty/bling
+        {:mvn/version "0.6.0"}}
+
+ :tasks
+ {:requires ([babashka.fs :as fs]
+             [bling.core :as bling]
+             [babashka.process :as p])
+  outdated
+  {:doc "Run command to detect outdate version of our deps"
+   :task (clojure "-M:outdated -m depot.outdated.main")}
+
+  nrepl
+  {:doc "Run a nRepl"
+   :task
+   (do
+     (bling/callout
+      {:type :info}
+      (bling/bling [:bold "Running nRepl"]))
+     (clojure "-M:nrepl"))}}}
