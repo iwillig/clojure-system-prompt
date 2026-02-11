@@ -67,6 +67,57 @@ Add to your `opencode.json` configuration file (project root or
 The instructions array accepts paths and glob patterns to instruction
 files. These are loaded as context for all conversations.
 
+### With Claude Code / Anthropic Skills
+
+This repository includes an [Anthropic
+Skill](https://github.com/anthropics/skills) package in the
+`clojure-repl-dev/` directory:
+
+**Option 1: Global installation (all projects)**
+
+```bash
+cp -r clojure-repl-dev ~/.claude/skills/
+```
+
+**Option 2: Project-specific installation**
+
+```bash
+mkdir -p .claude/skills
+cp -r clojure-repl-dev .claude/skills/
+```
+
+**Usage:**
+
+Once installed, invoke the skill with:
+
+```bash
+/skill:clojure-repl-dev
+```
+
+Or reference it when starting a task:
+
+```bash
+claude /skill:clojure-repl-dev "Create a function to parse JSON"
+```
+
+The skill will auto-load when working with Clojure files (`.clj`, `.cljs`, `.cljc`, `.edn`).
+
+### With pi Agent (Skills Mode)
+
+The skill can also be used with pi's skill system:
+
+```bash
+# Global installation
+cp -r clojure-repl-dev ~/.pi/agent/skills/
+
+# Or project-specific
+mkdir -p .pi/skills
+cp -r clojure-repl-dev .pi/skills/
+
+# Or use directly
+pi --skill /path/to/clojure-repl-dev
+```
+
 ## What This Prompt Provides
 
 - **REPL-first enforcement**: Code is tested in the REPL before being written to files
@@ -108,15 +159,30 @@ iteration, enabling smaller models to achieve results comparable to
 much larger ones while reducing the energy footprint of AI-assisted
 development.
 
+**Reference:** Kjellberg, V., Staron, M., & Fotrousi, F. (2026). *From LLMs to Agents in Programming: The Impact of Providing an LLM with a Compiler*. arXiv:2601.12146v1. https://arxiv.org/html/2601.12146v1
+
 ## Project Structure
 
 ```
 .
-├── SYSTEM.md      # The system prompt (copy this to your projects)
-├── research.md    # Research supporting custom prompts for niche languages
-├── CHANGELOG.md   # Version history
-└── LICENSE        # MIT License
+├── SYSTEM.md                    # The system prompt (copy this to your projects)
+├── clojure-repl-dev/            # Anthropic/pi skill package
+│   ├── SKILL.md                 # Core skill with essential workflow (168 lines)
+│   └── references/
+│       ├── tool-guide.md        # Complete tool documentation
+│       └── idioms.md            # Idiomatic patterns and anti-patterns
+├── agents.md                    # Instructions for maintaining SYSTEM.md and SKILL.md
+├── research.md                  # Research supporting custom prompts for niche languages
+├── CHANGELOG.md                 # Version history
+└── LICENSE                      # MIT License
 ```
+
+**Note:** `agents.md` contains synchronization instructions for keeping `SYSTEM.md` and `clojure-repl-dev/SKILL.md` consistent. See that file before modifying Clojure guidance.
+
+The skill follows the [Anthropic Skills Specification](https://agentskills.io/specification) with **progressive disclosure**:
+- Metadata (name + description) — always in context
+- SKILL.md — core workflow loaded when skill triggers (~4KB)
+- References — loaded only when needed by the agent
 
 ## Requirements
 
