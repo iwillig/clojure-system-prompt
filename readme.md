@@ -89,6 +89,25 @@ by:
 
 See [research.md](research.md) for detailed citations and evidence.
 
+## Rationale: The REPL as Compiler
+
+This approach is grounded in recent research demonstrating that LLMs
+with access to external validation tools significantly outperform
+model-only baselines. A 2026 study on 16 models (135M to 70B
+parameters) found that compiler access improved code compilation rates
+by 5.3 to 79.4 percentage points, with syntax errors dropping 75% and
+undefined references dropping 87%.
+
+The Clojure REPL serves the same function: it acts as a compiler and
+runtime oracle that grounds the AI in executable truth. Rather than
+generating code in a vacuum and hoping it works, the AI evaluates
+expressions in the REPL first—verifying syntax, testing behavior,
+and confirming correctness before writing to files. This shifts the AI
+from a passive code generator to an active agent with feedback-driven
+iteration, enabling smaller models to achieve results comparable to
+much larger ones while reducing the energy footprint of AI-assisted
+development.
+
 ## Project Structure
 
 ```
