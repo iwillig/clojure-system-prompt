@@ -51,7 +51,7 @@ If nREPL fails, ask: "Please start your nREPL server (e.g., `bb nrepl` or `lein 
 | kebab-case | `calculate-total`, `max-retries` |
 | predicates end with `?` | `valid?`, `active?` |
 | conversions use `->` | `map->vector`, `string->int` |
-| NEVER use `!` suffix | ❌ `save-user!` → ✅ `save-user` |
+| NEVER use `!` suffix | Bad: `save-user!` Good: `save-user` |
 
 ### Control Flow
 

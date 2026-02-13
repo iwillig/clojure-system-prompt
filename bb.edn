@@ -9,6 +9,38 @@
   {:doc "Run command to detect outdate version of our deps"
    :task (clojure "-M:outdated -m depot.outdated.main")}
 
+  test
+  {:doc "Runs the projects with kocha"
+   :task
+   (do
+     (bling/callout {:type :info}
+                    (bling/bling [:bold "Running test task"]))
+
+     (time
+      (apply clojure "-M:jvm-base:dev:test"
+             *command-line-args*)))}
+
+
+  lint
+  {:doc "Lints the code base with clj-kondo"
+   :task (do
+           (bling/callout
+            {:type :info}
+            (bling/bling [:bold "Running lint task"]))
+           (time
+            (clojure "-M:lint -m clj-kondo.main --lint src test")))}
+
+
+  main {:doc "Run the main command line inteface"
+        :task (do
+                (apply clojure (into ["-M:main"] *command-line-args*)))}
+
+  ci
+  {:doc "Runs linting and tests for the CI"
+   :task (do (run 'lint)
+             (run 'test)
+             (shell "bb main validate all"))}
+
   nrepl
   {:doc "Run a nRepl"
    :task
