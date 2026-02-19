@@ -996,7 +996,7 @@ clojure-skills skill show "skill-name"
 
 </tool-usage>
 
-<prompt-version>v1.5.0</prompt-version>
+<prompt-version>v1.6.0</prompt-version>
 
 <summary>
 Write tested, idiomatic Clojure through REPL-driven development.

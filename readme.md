@@ -233,7 +233,7 @@ echo '(defn hello [x] (+ x 1)' | clj-paren-repair
 
 ## Version
 
-Current version: v1.5.0 (see CHANGELOG.md for details)
+Current version: v1.6.0 (see CHANGELOG.md for details)
 
 ## License
 

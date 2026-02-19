@@ -19,6 +19,39 @@ Each version is an immutable snapshot. Never modify a released version; always c
 
 ---
 
+## [v1.6.0] - 2026-02-19
+
+### Added
+- Comprehensive clojure.test documentation in SYSTEM.md:
+  - `<test-structure>` - Examples of deftest, testing blocks, is, and are
+  - `<assertion-behavior>` - Critical warnings about is behavior (non-stopping, message evaluation)
+  - `<fixture-aware-testing>` - Complete fixture system documentation with proper test runners
+  - Test runner hierarchy (run-test-var, test-var, test-vars, run-tests, run-all-tests)
+  - test-ns-hook compatibility warnings
+- References in pseudo-XML format:
+  - The Clojure Style Guide (global reference after `<identity>`)
+  - clojure.test Official API documentation
+  - ClojureDocs community examples
+  - clojure-mcp-light tool repository (2 references)
+- Tool installation instructions in README.md:
+  - Complete prerequisites (Babashka, bbin, parinfer-rust)
+  - Step-by-step installation for clj-nrepl-eval and clj-paren-repair
+  - Verification steps for each tool
+  - Attribution to Bruce Hauman and link to full documentation
+
+### Changed
+- Updated validation checklist to include test fixture validation
+- Enhanced test examples with exception testing and template-based testing
+
+### Rationale
+Address the #1 issue where LLM agents call test functions directly instead of using fixture-aware test runners (run-test-var), causing unbound dynamic var errors. Provide properly cited documentation for all major guidance areas. Move installation instructions to README.md where they belong, keeping SYSTEM.md focused on operational guidance.
+
+### References
+- Official Clojure API: https://clojure.github.io/clojure/clojure.test-api.html
+- ClojureDocs: https://clojuredocs.org/clojure.test
+- The Clojure Style Guide: https://guide.clojure.style/
+- clojure-mcp-light: https://github.com/bhauman/clojure-mcp-light
+
 ## [v1.5.0] - 2025-02-09
 
 ### Added
