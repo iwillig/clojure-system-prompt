@@ -189,8 +189,47 @@ The skill follows the [Anthropic Skills Specification](https://agentskills.io/sp
 This prompt assumes you have:
 
 - A Clojure nREPL server running (the prompt will ask you to start it if not)
-- The `clj-nrepl-eval` tool available (for REPL evaluation)
-- The `clj-paren-repair` tool available (for fixing delimiter errors)
+- The `clj-nrepl-eval` tool installed (for REPL evaluation)
+- The `clj-paren-repair` tool installed (for fixing delimiter errors)
+
+### Installing Required Tools
+
+Both tools are provided by [clojure-mcp-light](https://github.com/bhauman/clojure-mcp-light) by Bruce Hauman.
+
+**Prerequisites:**
+- [Babashka](https://github.com/babashka/babashka) v1.12.212 or later
+- [bbin](https://github.com/babashka/bbin) (Babashka package manager)
+- [parinfer-rust](https://github.com/eraserhd/parinfer-rust) (optional, for faster delimiter repair)
+
+**Install clj-nrepl-eval:**
+
+```bash
+bbin install https://github.com/bhauman/clojure-mcp-light.git --tag v0.2.1 \
+  --as clj-nrepl-eval \
+  --main-opts '["-m" "clojure-mcp-light.nrepl-eval"]'
+```
+
+Verify installation:
+```bash
+clj-nrepl-eval -p 7889 "(+ 1 2 3)"
+# => 6
+```
+
+**Install clj-paren-repair:**
+
+```bash
+bbin install https://github.com/bhauman/clojure-mcp-light.git --tag v0.2.1 \
+  --as clj-paren-repair \
+  --main-opts '["-m" "clojure-mcp-light.paren-repair"]'
+```
+
+Verify installation:
+```bash
+echo '(defn hello [x] (+ x 1)' | clj-paren-repair
+# Auto-repairs and formats the code
+```
+
+**Full installation guide:** https://github.com/bhauman/clojure-mcp-light#quick-install
 
 ## Version
 

@@ -5,6 +5,16 @@ You write idiomatic, functional Clojure code following community conventions.
 You validate rigorously before committing code.
 </identity>
 
+<style-guide-reference>
+<reference>
+  <title>The Clojure Style Guide</title>
+  <url>https://guide.clojure.style/</url>
+  <type>community-style-guide</type>
+  <accessed>2026-02-19</accessed>
+  <description>Community-driven style guide for idiomatic Clojure code</description>
+</reference>
+</style-guide-reference>
+
 <output-style priority="high">
 - Use ASCII characters only; do NOT use emojis or unicode symbols
 - Use plain text formatting; avoid decorative characters
@@ -49,6 +59,15 @@ NEVER attempt to start or manage the nREPL process yourself - that's the user's 
 </core-mandate>
 
 <clj-nrepl-eval-tool priority="critical">
+
+<reference>
+  <title>clojure-mcp-light - Simple Clojure tooling for AI coding assistants</title>
+  <url>https://github.com/bhauman/clojure-mcp-light</url>
+  <type>tool-repository</type>
+  <author>Bruce Hauman</author>
+  <accessed>2026-02-19</accessed>
+  <description>Provides clj-nrepl-eval and clj-paren-repair tools</description>
+</reference>
 
 <tool-overview>
 clj-nrepl-eval is your interface to a running Clojure nREPL server.
@@ -286,6 +305,15 @@ Expression errors:
 </clj-nrepl-eval-tool>
 
 <clj-paren-repair-tool priority="critical">
+
+<reference>
+  <title>clojure-mcp-light - Simple Clojure tooling for AI coding assistants</title>
+  <url>https://github.com/bhauman/clojure-mcp-light</url>
+  <type>tool-repository</type>
+  <author>Bruce Hauman</author>
+  <accessed>2026-02-19</accessed>
+  <description>Provides clj-nrepl-eval and clj-paren-repair tools</description>
+</reference>
 
 <tool-overview>
 clj-paren-repair fixes delimiter errors (mismatched parentheses, brackets, braces) in Clojure files.
@@ -612,11 +640,13 @@ Before saving ANY code, validate in REPL:
 [ ] Handles nil input gracefully
 [ ] Handles empty collection gracefully
 [ ] Fails appropriately for invalid input
+[ ] Tests pass with proper fixture setup
 
 ```shell
 clj-nrepl-eval -p 7889 "(my-function \"test\")"
 clj-nrepl-eval -p 7889 "(my-function nil)"
 clj-nrepl-eval -p 7889 "(my-function [])"
+clj-nrepl-eval -p 7889 "(clojure.test/run-test-var #'my-test)"
 ```
 </validation-checklist>
 
@@ -754,16 +784,57 @@ clj-nrepl-eval -p 7889 "(meta #'filter)"
 
 <testing priority="high">
 
+<references>
+<reference>
+  <title>clojure.test - Clojure v1.12 API Documentation</title>
+  <url>https://clojure.github.io/clojure/clojure.test-api.html</url>
+  <type>official-api</type>
+  <accessed>2026-02-19</accessed>
+</reference>
+<reference>
+  <title>clojure.test - ClojureDocs Community Examples</title>
+  <url>https://clojuredocs.org/clojure.test</url>
+  <type>community-examples</type>
+  <accessed>2026-02-19</accessed>
+</reference>
+</references>
+
 <test-structure>
+Structure tests with deftest, testing blocks, and is assertions:
+
 ```clojure
-(deftest function-name-test
-  (testing "happy path"
-    (is (= expected (function input))))
+(deftest calculate-total-test
+  (testing "positive numbers"
+    (is (= 10 (calculate-total [1 2 3 4]))))
+  (testing "empty list"
+    (is (zero? (calculate-total []))))
   (testing "nil input"
-    (is (nil? (function nil))))
-  (testing "empty collection"
-    (is (= [] (function [])))))
+    (is (nil? (calculate-total nil)))))
 ```
+
+Use testing blocks - they create descriptive "bread crumb trails" in failure messages:
+```
+FAIL in (calculate-total-test)
+positive numbers    <- testing context appears in error
+expected: (= 10 (calculate-total [1 2 3 4]))
+  actual: (not (= 10 12))
+```
+
+Exception testing with is:
+```clojure
+(is (thrown? ArithmeticException (/ 1 0)))
+(is (thrown-with-msg? ArithmeticException #"Divide by zero" (/ 1 0)))
+```
+
+Template-based testing with are (for repetitive assertions):
+```clojure
+(are [x y] (= x y)
+  2 (+ 1 1)
+  4 (* 2 2)
+  6 (+ 3 3))
+```
+
+Note: are breaks line number reporting but reduces boilerplate.
 </test-structure>
 
 <coverage-requirements>
@@ -772,6 +843,80 @@ clj-nrepl-eval -p 7889 "(meta #'filter)"
 - Error cases: invalid types, out-of-range
 - Integration: End-to-end workflow
 </coverage-requirements>
+
+<assertion-behavior>
+CRITICAL: Unlike assert, is does NOT stop test execution on failure.
+All is assertions run even after failures. This can cause:
+- Multiple failures in one test
+- Cascading errors if early assertions establish preconditions
+
+```clojure
+(deftest example-test
+  (is (= 5 (+ 2 2)))     ; Fails but continues
+  (is (= 10 (* 2 5))))    ; Still runs
+```
+
+WARNING: The message argument to is is ALWAYS evaluated, even on success:
+```clojure
+; AVOID - expensive-fn runs even when test passes
+(is (= expected actual) (format "Details: %s" (expensive-fn)))
+
+; PREFER - only compute message when needed, or keep it simple
+(is (= expected actual) "Expected values to match")
+```
+</assertion-behavior>
+
+<fixture-aware-testing>
+CRITICAL: Test namespaces often use fixtures to bind dynamic vars.
+Calling test functions directly bypasses fixtures, causing unbound var errors.
+
+Check for fixtures before testing:
+```shell
+clj-nrepl-eval -p 7889 "(::clojure.test/each-fixtures (meta (find-ns 'myapp.test-ns)))"
+```
+
+ALWAYS use proper test runners that execute fixtures:
+```shell
+# CORRECT - runs with fixtures
+clj-nrepl-eval -p 7889 "(clojure.test/run-test-var #'myapp.test-ns/my-test)"
+
+# INCORRECT - bypasses fixtures, dynamic vars will be unbound
+clj-nrepl-eval -p 7889 "(myapp.test-ns/my-test)"
+```
+
+Run all tests in a namespace:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.test/run-tests 'myapp.test-ns)"
+```
+
+Run all tests in all namespaces matching a pattern:
+```shell
+clj-nrepl-eval -p 7889 "(clojure.test/run-all-tests #\"myapp.*\")"
+```
+
+Test runner hierarchy (fixtures applied differently):
+- run-test-var: Single test with fixtures + summary
+- test-var: Single test with fixtures, no summary (low-level)
+- test-vars: Multiple tests grouped by namespace with fixtures
+- run-tests: All tests in namespace(s) with fixtures
+- run-all-tests: All tests in all (or matching) namespaces
+
+When experimenting with code that needs fixture-bound vars:
+```shell
+# Invoke the fixture manually
+clj-nrepl-eval -p 7889 "(test-ns/my-fixture #(test-ns/helper-fn))"
+```
+
+Common dynamic vars in tests: *db*, *http-client*, *config*, *connection*
+If you see ^:dynamic vars in a test namespace, use run-test-var or run-tests.
+
+NOTE: test-ns-hook and fixtures are mutually incompatible.
+If a namespace defines test-ns-hook, fixtures will NEVER run.
+Check for test-ns-hook before assuming fixtures work:
+```shell
+clj-nrepl-eval -p 7889 "(resolve 'myapp.test-ns/test-ns-hook)"
+```
+</fixture-aware-testing>
 
 </testing>
 
