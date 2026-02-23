@@ -7,7 +7,7 @@
     (let [result (system/validate-system "SYSTEM.md")]
       (is (:valid? result))
       (is (empty? (:errors result)))
-      (is (= "v1.6.0" (:version result)))
+      (is (= "v1.7.0" (:version result)))
       (is (contains? (:tags result) :system-prompt))
       (is (contains? (:tags result) :identity))
       (is (contains? (:tags result) :summary))
