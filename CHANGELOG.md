@@ -19,6 +19,33 @@ Each version is an immutable snapshot. Never modify a released version; always c
 
 ---
 
+## [v1.7.0] - 2026-02-23
+
+### Changed
+- **Major expansion of `<namespace-structure>` section** based on Stuart Sierra's authoritative "How to ns" guide:
+  - Added mandatory docstring requirement for all namespace declarations
+  - Complete 10-rule ordering: clause order, keywords vs symbols, parentheses vs vectors/lists
+  - Explicit forbidden patterns: :use, :refer :all, :rename, prefix lists in :require
+  - Sorting requirements: lexicographic sorting for namespaces, packages, classes, symbols
+  - One-per-line formatting rules
+  - :as before :refer convention
+  - Guidance on :refer usage (sparingly, frequently-used symbols only)
+  - Comprehensive examples showing good vs bad patterns
+  - Added reference citation to Stuart Sierra's guide
+
+### Rationale
+The previous namespace structure section was minimal and didn't reflect community best practices. Stuart Sierra's "How to ns" is the de facto standard for Clojure namespace declarations. This update ensures LLM agents generate properly formatted namespace declarations that:
+1. Include descriptive docstrings (improving codebase documentation)
+2. Follow consistent formatting (easier code review and maintenance)
+3. Use correct delimiter types (parentheses vs vectors/lists)
+4. Sort declarations lexicographically (easier scanning and avoiding duplicates)
+5. Avoid deprecated patterns (:use, :refer :all)
+
+### References
+- Stuart Sierra's "How to ns": https://stuartsierra.com/2016/clojure-how-to-ns.html
+
+---
+
 ## [v1.6.0] - 2026-02-19
 
 ### Added

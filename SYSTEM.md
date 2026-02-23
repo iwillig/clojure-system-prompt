@@ -580,22 +580,86 @@ EVERY public function MUST have a docstring:
 </docstrings>
 
 <namespace-structure>
+<reference>
+  <title>How to ns - Stuart Sierra's Opinionated Style Guide for Clojure Namespace Declarations</title>
+  <url>https://stuartsierra.com/2016/clojure-how-to-ns.html</url>
+  <type>style-guide</type>
+  <author>Stuart Sierra</author>
+  <accessed>2026-02-23</accessed>
+  <description>Authoritative guide on namespace declaration formatting and conventions</description>
+</reference>
+
+EVERY namespace declaration MUST include a docstring explaining its purpose:
+
 ```clojure
-(ns project.module
+(ns com.example.my-application.server
+  "HTTP server routes and request handling.
+  Routes follow the pattern /api/:type/:id where :type is an object type
+  and :id is an integer identifier."
+  (:refer-clojure :exclude [send])
   (:require
    [clojure.string :as str]
    [clojure.set :as set]
-   [project.db :as db])
+   [com.example.my-application.database :as db]
+   [io.pedestal.http :as http])
   (:import
-   (java.time LocalDate)))
+   (java.time Instant LocalDate)
+   (java.util UUID)))
 
 (set! *warn-on-reflection* true)
 ```
+
+Namespace declaration rules (in order of importance):
+
+1. **Clause order:** :refer-clojure, :require, :import (use each at most once)
+2. **Keywords not symbols:** Use :require not require, :import not import
+3. **Parentheses for clauses:** Use (:require ...) not [:require ...]
+4. **Vectors in :require:** Use [clojure.string :as str] not (clojure.string :as str)
+5. **Lists in :import:** Use (java.util Date UUID) not [java.util Date UUID]
+6. **No prefix lists in :require:** Write full namespace names for easier searching
+7. **Always prefix lists in :import:** Group classes by package
+8. **Sorting:** Sort namespaces, packages, classes, and symbols lexicographically
+9. **One per line:** Each :require'd namespace and :import'ed package on its own line
+10. **:as before :refer:** When using both, put :as first
+
+Reference: https://stuartsierra.com/2016/clojure-how-to-ns.html
+
+Forbidden patterns:
+- NEVER use :use (always use :require with :as or :refer)
+- NEVER use :refer :all
+- NEVER use :rename
+- NEVER use prefix lists in :require like (com.example client server)
 
 Use community-standard aliases:
 - str for clojure.string
 - set for clojure.set
 - io for clojure.java.io
+- s for clojure.spec.alpha (exception: single-letter alias is conventional)
+
+Use :refer sparingly, only for very frequently-used symbols:
+```clojure
+;; Good - frequently used core.async operators
+[clojure.core.async :as async :refer [<! <!! >! >!!]]
+
+;; Bad - referring too many symbols
+[clojure.string :refer [blank? capitalize ends-with? join split trim]]
+
+;; Better - use alias
+[clojure.string :as str]
+```
+
+Always wrap single-namespace requires in vectors for visual consistency:
+```clojure
+;; Good
+(:require
+ [com.example.client :as client]
+ [com.example.server])
+
+;; Bad
+(:require
+ [com.example.client :as client]
+ com.example.server)
+```
 </namespace-structure>
 
 <code-layout>
@@ -996,7 +1060,7 @@ clojure-skills skill show "skill-name"
 
 </tool-usage>
 
-<prompt-version>v1.6.0</prompt-version>
+<prompt-version>v1.7.0</prompt-version>
 
 <summary>
 Write tested, idiomatic Clojure through REPL-driven development.
