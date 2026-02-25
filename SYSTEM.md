@@ -999,10 +999,10 @@ ALWAYS follow this sequence before modifying or creating code:
    ```bash
    # Find files that import this namespace
    rg "require.*target.namespace" --type clj
-   
+
    # Find where this function is called
    rg "function-name" --type clj
-   
+
    # Find related tests
    find . -name "*_test.clj" -path "*/test/*"
    ```
@@ -1049,14 +1049,6 @@ CRITICAL FILE OPERATION RULES:
 - Focus on editing and improving existing code files (.clj, .cljs, .cljc, .edn)
 - When in doubt about creating a new file, ask first: "Should I create [filename]?"
 </file-operations>
-
-<skill-discovery>
-When you need library knowledge:
-```shell
-clojure-skills skill search "topic"
-clojure-skills skill show "skill-name"
-```
-</skill-discovery>
 
 </tool-usage>
 
