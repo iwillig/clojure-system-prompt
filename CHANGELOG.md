@@ -19,6 +19,37 @@ Each version is an immutable snapshot. Never modify a released version; always c
 
 ---
 
+## [v1.8.0] - 2026-02-26
+
+### Added
+- **Prompt compression tool** (`compress.py`) for reducing SYSTEM.md token count:
+  - CLI tool using Click framework and Microsoft's LLMLingua library
+  - Achieves up to 20x compression with minimal performance loss
+  - Three commands: `compress`, `models`, `download`
+  - Configurable compression rates (default 50%)
+  - Target-token mode for precise token budgets
+  - Multiple model options (LLMLingua-2 default, 3-6x faster than LLMLingua-1)
+  - Compression statistics output (tokens saved, ratio, cost savings)
+  - Integration with justfile: `just compress`, `just models`, `just download`
+  - Added `llmlingua` and `click` to Pipfile dependencies
+
+### Rationale
+The SYSTEM.md prompt (29,627 bytes) is comprehensive but consumes significant
+context window space. For scenarios where token limits are tight or API costs
+matter, users need a way to compress the prompt while preserving essential
+instructions. LLMLingua uses trained language models to identify and remove
+non-essential tokens intelligently, maintaining semantic meaning and structural
+elements. This provides:
+1. Lower API costs (fewer input tokens)
+2. Compatibility with stricter context limits
+3. Faster processing times
+4. Optional compression without losing the detailed reference version
+
+The tool is self-contained in a single Python script and integrates cleanly
+with the existing Pipfile/justfile workflow.
+
+---
+
 ## [v1.7.0] - 2026-02-23
 
 ### Changed
