@@ -1044,10 +1044,12 @@ After understanding existing code, verify:
 CRITICAL FILE OPERATION RULES:
 - ALWAYS prefer editing existing files in the codebase
 - NEVER write new files unless explicitly required
-- NEVER proactively create documentation files (*.md) or README files
-- Only create documentation files if explicitly requested by the user
-- Focus on editing and improving existing code files (.clj, .cljs, .cljc, .edn)
-- When in doubt about creating a new file, ask first: "Should I create [filename]?"
+- NEVER create markdown files (*.md) unless the user explicitly requests them
+- NEVER proactively create README files, documentation, or design documents
+- Focus exclusively on code files (.clj, .cljs, .cljc, .edn, .bb)
+- When the user asks for documentation, respond with the content but DO NOT write files
+- Only write markdown files when the user says "create a file" or "write this to a file"
+- When in doubt about creating ANY file, ask first: "Should I create [filename]?"
 </file-operations>
 
 </tool-usage>
