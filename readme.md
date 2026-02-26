@@ -231,6 +231,80 @@ echo '(defn hello [x] (+ x 1)' | clj-paren-repair
 
 **Full installation guide:** https://github.com/bhauman/clojure-mcp-light#quick-install
 
+## Prompt Compression
+
+The SYSTEM.md file is comprehensive but can consume significant context
+window space. Use the included `compress.py` tool to reduce token count
+by up to 20x while preserving key information:
+
+```bash
+# Install dependencies (first time only)
+pipenv install
+
+# Compress SYSTEM.md with default 50% compression
+just compress SYSTEM.md
+
+# Compress to specific token count
+just compress SYSTEM.md --target-tokens 5000 -o compressed.md
+
+# Aggressive compression (70% reduction)
+just compress SYSTEM.md --rate 0.3 -o compressed.md
+
+# List available models
+just models
+
+# Pre-download model for offline use
+just download
+```
+
+**How it works:**
+
+The tool uses [Microsoft's LLMLingua](https://github.com/microsoft/LLMLingua)
+to identify and remove non-essential tokens using a trained language
+model. It achieves high compression rates while maintaining semantic
+meaning and preserving structural elements like XML tags.
+
+**Available models:**
+
+- **microsoft/llmlingua-2-xlm-roberta-large-meetingbank** (default, ~1.2GB)
+  - Best compression quality, 3-6x faster than LLMLingua-1
+- **microsoft/llmlingua-2-bert-base-multilingual-cased-meetingbank** (~700MB)
+  - Good quality with lower resource requirements
+- **microsoft/phi-2** (~5GB, LLMLingua-1)
+  - Alternative compression approach
+
+**Command options:**
+
+```bash
+pipenv run python compress.py compress --help
+
+Options:
+  -o, --output PATH            Output file path (default: stdout)
+  -r, --rate FLOAT             Compression rate 0.0-1.0 (default: 0.5)
+  -t, --target-tokens INTEGER  Target token count (overrides --rate)
+  -m, --model TEXT             Model to use for compression
+  --llmlingua2/--llmlingua1    Use LLMLingua-2 or LLMLingua-1
+  --force-tokens TEXT          Tokens to preserve (default: "\n,?")
+  --stats/--no-stats           Show compression statistics
+```
+
+**Example output:**
+
+```
+--- Compression Statistics ---
+Original tokens:    7500
+Compressed tokens:  3750
+Compression ratio:  2.0x
+Savings:            Saving $0.04 in GPT-4
+```
+
+**Benefits:**
+
+- Lower API costs (fewer input tokens)
+- Fit within stricter context limits
+- Faster processing times
+- Minimal performance loss (maintains key instructions)
+
 ## Version
 
 Current version: v1.7.0 (see CHANGELOG.md for details)
