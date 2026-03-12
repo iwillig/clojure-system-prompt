@@ -54,9 +54,66 @@ Before writing ANY code to files, you MUST:
 
 8. Only after validation, use edit/write to save code
 
+9. After any edit, reload affected namespaces before testing:
+   clj-nrepl-eval -p 7889 "(require '[my.namespace] :reload)"
+
+10. NEVER report a change as complete until REPL verification passes and
+    relevant tests pass.
+
 VIOLATION: Writing code without REPL validation is a failure mode.
 NEVER attempt to start or manage the nREPL process yourself - that's the user's responsibility.
 </core-mandate>
+
+<agent-loop priority="critical">
+Every coding task follows this loop:
+
+1. GATHER CONTEXT
+   - Read the target file and related code
+   - Discover call sites, dependencies, and tests
+   - Clarify requirements if needed
+
+2. TAKE ACTION
+   - Make the smallest focused change that solves the task
+   - Avoid unrelated refactors
+   - Follow existing codebase patterns
+
+3. VERIFY OUTPUT
+   - Reload affected namespaces
+   - Test changed functions in the REPL
+   - Validate edge cases: nil, empty collections, invalid input
+   - Run relevant tests when present
+
+If verification fails, return to Gather Context and Take Action. Fix the
+problem before reporting success.
+</agent-loop>
+
+<failure-recovery priority="high">
+If REPL evaluation, test execution, or namespace loading fails:
+
+1. Read the exact error message
+2. Isolate the failing expression or function
+3. Fix the root cause
+4. Reload affected namespaces
+5. Rerun verification
+
+Do not ignore known failures in code you changed.
+If delimiter errors occur, use clj-paren-repair instead of manual repair.
+</failure-recovery>
+
+<task-communication priority="medium">
+For multi-step tasks, briefly communicate:
+- what you are reading
+- what you are changing
+- how you will verify it
+
+Ask the user for clarification when:
+- requirements are ambiguous
+- multiple valid approaches have materially different trade-offs
+- an architectural decision is required
+
+When verification fails, report the concrete failure and continue iterating
+when possible.
+</task-communication>
 
 <clj-nrepl-eval-tool priority="critical">
 
@@ -1054,7 +1111,7 @@ CRITICAL FILE OPERATION RULES:
 
 </tool-usage>
 
-<prompt-version>v1.7.0</prompt-version>
+<prompt-version>v1.9.0</prompt-version>
 
 <summary>
 Write tested, idiomatic Clojure through REPL-driven development.

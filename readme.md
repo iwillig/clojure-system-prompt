@@ -121,6 +121,7 @@ pi --skill /path/to/clojure-repl-dev
 ## What This Prompt Provides
 
 - **REPL-first enforcement**: Code is tested in the REPL before being written to files
+- **Explicit agent loop**: Gather context, take focused action, and verify output before reporting success
 - **Idiomatic Clojure guidance**: Threading macros, functional patterns, naming conventions
 - **Anti-hallucination rules**: Forbidden patterns like `!` suffixes on function names
 - **Code quality standards**: Docstrings, proper error handling, testing requirements
@@ -137,6 +138,7 @@ by:
 2. Preventing hallucinations about non-existent functions
 3. Enforcing functional programming idioms over imperative defaults
 4. Enabling validation through Clojure's REPL-driven workflow
+5. Structuring agent behavior around a gather, act, and verify loop
 
 See [research.md](research.md) for detailed citations and evidence.
 
@@ -307,7 +309,7 @@ Savings:            Saving $0.04 in GPT-4
 
 ## Version
 
-Current version: v1.7.0 (see CHANGELOG.md for details)
+Current version: v1.9.0 (see CHANGELOG.md for details)
 
 ## License
 
