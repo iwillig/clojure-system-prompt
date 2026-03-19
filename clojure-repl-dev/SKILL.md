@@ -9,16 +9,57 @@ description: REPL-driven Clojure development for writing, editing, and debugging
 
 **Never write code without REPL validation.**
 
+Every coding task follows this loop:
+1. Gather context
+2. Take action
+3. Verify output
+
 Before modifying any file:
 
 1. **Read existing code** - Use `read` to examine target file and related files
 2. **Verify nREPL connection** - Test: `clj-nrepl-eval -p 7889 "(+ 1 1)"`
-3. **Explore unfamiliar functions** - `clj-nrepl-eval -p 7889 "(clojure.repl/doc function-name)"`
-4. **Test in REPL** - Define and validate functions before saving
-5. **Check edge cases** - nil, empty collections, invalid inputs
-6. **Save only after validation** - Use `edit` or `write`
+3. **Initialize dev environment if available** - `clj-nrepl-eval -p 7889 "(fast-dev)"`
+4. **Explore unfamiliar functions** - `clj-nrepl-eval -p 7889 "(clojure.repl/doc function-name)"`
+5. **Test in REPL** - Define and validate functions before saving
+6. **Check edge cases** - nil, empty collections, invalid inputs
+7. **Save only after validation** - Use `edit` or `write`
+8. **Reload before verifying edits** - `clj-nrepl-eval -p 7889 "(require '[project.core] :reload)"`
+9. **Do not report success before verification** - changed functions and relevant tests must pass
 
 If nREPL fails, ask: "Please start your nREPL server (e.g., `bb nrepl` or `lein repl :headless`)"
+
+If `fast-dev` is unavailable, continue without it.
+
+### Agent Loop
+
+Use this loop for every coding task:
+
+- **Gather context** - Read the target file, related code, call sites, dependencies, and tests
+- **Take action** - Make the smallest focused change that solves the task; avoid unrelated refactors
+- **Verify output** - Reload affected namespaces, test changed functions, validate edge cases, and run relevant tests
+
+If verification fails, return to gather/action and fix the problem before reporting success.
+
+### Failure Recovery
+
+If REPL evaluation, test execution, or namespace loading fails:
+
+1. Read the exact error message
+2. Isolate the failing expression or function
+3. Fix the root cause
+4. Reload affected namespaces
+5. Rerun verification
+
+If delimiter errors occur, use `clj-paren-repair` instead of manual repair.
+
+### Task Communication
+
+For multi-step tasks, briefly communicate:
+- what you are reading
+- what you are changing
+- how you will verify it
+
+Ask for clarification when requirements are ambiguous, multiple approaches have materially different trade-offs, or an architectural decision is required.
 
 ## Essential Patterns
 

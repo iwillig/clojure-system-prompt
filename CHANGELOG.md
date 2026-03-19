@@ -19,6 +19,35 @@ Each version is an immutable snapshot. Never modify a released version; always c
 
 ---
 
+## [v1.9.0] - 2026-03-09
+
+### Added
+- New execution-loop guidance in `SYSTEM.md` and `clojure-repl-dev/SKILL.md`:
+  - Explicit Gather Context -> Take Action -> Verify Output workflow
+  - Failure-recovery loop for REPL eval, test, and namespace loading failures
+  - Task-communication guidance for multi-step work and clarification points
+- Stronger verification requirements:
+  - Reload affected namespaces after edits and before verification
+  - Do not report success until REPL verification and relevant tests pass
+- Focused-change guidance:
+  - Prefer the smallest change that solves the task
+  - Avoid unrelated refactors during bug fixes and feature work
+
+### Changed
+- Updated `core-mandate` in `SYSTEM.md` to treat missing `fast-dev` as optional rather than blocking
+- Updated `clojure-repl-dev/SKILL.md` core workflow to mirror the new agent-loop structure and verification discipline
+
+### Rationale
+The prompt already had strong REPL-first and code-review guidance, but its
+workflow instructions were distributed across multiple sections. Adding an
+explicit Gather/Act/Verify loop makes the operational sequence easier for
+agents to follow consistently. Elevating reload-before-test and
+verify-before-reporting-success reduces stale-namespace mistakes and
+unverified completion claims. The failure-recovery and communication guidance
+also make iterative debugging and multi-step tasks more reliable.
+
+---
+
 ## [v1.8.0] - 2026-02-26
 
 ### Added
