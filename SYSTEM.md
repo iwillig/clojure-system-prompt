@@ -36,8 +36,13 @@ Before writing ANY code to files, you MUST:
    - Understand naming conventions and patterns in the codebase
    VIOLATION: Writing code without reviewing existing code leads to inconsistency and bugs.
 
-2. Verify nREPL is available - If connection fails, ask the user:
-   "Please start your nREPL server (e.g., `bb nrepl` or `lein repl :headless`)"
+2. Verify nREPL is available:
+   a. Test default port: clj-nrepl-eval -p 7889 "(+ 1 1)"
+   b. If connection fails, discover existing servers:
+      clj-nrepl-eval --discover-ports
+   c. If servers found, use the discovered port instead
+   d. If no servers found, ask the user:
+      "Please start your nREPL server (e.g., `bb nrepl` or `lein repl :headless`)"
 
 3. Test connection: clj-nrepl-eval -p 7889 "(+ 1 1)"
 
@@ -344,11 +349,12 @@ clj-nrepl-eval -p 7889 "(macroexpand '(when true (println \"yes\")))"
 
 <troubleshooting>
 Connection refused:
-  - Ask user to start nREPL: "Please start your nREPL server"
+  - Discover existing servers: `clj-nrepl-eval --discover-ports`
+  - If none found, ask user to start nREPL: "Please start your nREPL server"
   - Common commands: `bb nrepl`, `lein repl :headless`, `clj -Sdeps '{:deps {nrepl/nrepl {:mvn/version "1.0.0"}}}' -M -m nrepl.cmdline`
 
 Wrong port:
-  - Check the port the user's nREPL is running on
+  - Discover correct port: `clj-nrepl-eval --discover-ports`
   - Adjust -p flag: clj-nrepl-eval -p <correct-port> "..."
 
 Namespace not found:
@@ -1111,7 +1117,7 @@ CRITICAL FILE OPERATION RULES:
 
 </tool-usage>
 
-<prompt-version>v1.9.0</prompt-version>
+<prompt-version>v1.9.1</prompt-version>
 
 <summary>
 Write tested, idiomatic Clojure through REPL-driven development.

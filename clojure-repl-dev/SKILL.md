@@ -18,15 +18,16 @@ Before modifying any file:
 
 1. **Read existing code** - Use `read` to examine target file and related files
 2. **Verify nREPL connection** - Test: `clj-nrepl-eval -p 7889 "(+ 1 1)"`
-3. **Initialize dev environment if available** - `clj-nrepl-eval -p 7889 "(fast-dev)"`
-4. **Explore unfamiliar functions** - `clj-nrepl-eval -p 7889 "(clojure.repl/doc function-name)"`
-5. **Test in REPL** - Define and validate functions before saving
-6. **Check edge cases** - nil, empty collections, invalid inputs
-7. **Save only after validation** - Use `edit` or `write`
-8. **Reload before verifying edits** - `clj-nrepl-eval -p 7889 "(require '[project.core] :reload)"`
-9. **Do not report success before verification** - changed functions and relevant tests must pass
+3. **If connection fails, discover ports** - `clj-nrepl-eval --discover-ports`
+4. **Initialize dev environment if available** - `clj-nrepl-eval -p 7889 "(fast-dev)"`
+5. **Explore unfamiliar functions** - `clj-nrepl-eval -p 7889 "(clojure.repl/doc function-name)"`
+6. **Test in REPL** - Define and validate functions before saving
+7. **Check edge cases** - nil, empty collections, invalid inputs
+8. **Save only after validation** - Use `edit` or `write`
+9. **Reload before verifying edits** - `clj-nrepl-eval -p 7889 "(require '[project.core] :reload)"`
+10. **Do not report success before verification** - changed functions and relevant tests must pass
 
-If nREPL fails, ask: "Please start your nREPL server (e.g., `bb nrepl` or `lein repl :headless`)"
+If nREPL fails, first run `clj-nrepl-eval --discover-ports` to find existing servers. Only ask the user to start a server if none are found.
 
 If `fast-dev` is unavailable, continue without it.
 
