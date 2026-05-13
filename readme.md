@@ -309,7 +309,7 @@ Savings:            Saving $0.04 in GPT-4
 
 ## Version
 
-Current version: v1.9.0 (see CHANGELOG.md for details)
+Current version: v1.9.1 (see CHANGELOG.md for details)
 
 ## License
 

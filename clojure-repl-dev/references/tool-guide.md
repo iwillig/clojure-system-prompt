@@ -125,7 +125,11 @@ The tool:
 
 ### Connection refused
 
-Ask user to start nREPL:
+1. Discover existing servers first:
+```shell
+clj-nrepl-eval --discover-ports
+```
+2. If none found, ask user to start nREPL:
 ```bash
 bb nrepl
 lein repl :headless
@@ -134,8 +138,9 @@ clj -Sdeps '{:deps {nrepl/nrepl {:mvn/version "1.0.0"}}}' -M -m nrepl.cmdline
 
 ### Wrong port
 
-Check actual port and adjust:
+Discover correct port and adjust:
 ```shell
+clj-nrepl-eval --discover-ports
 clj-nrepl-eval -p <correct-port> "(...)"
 ```
 

@@ -16,6 +16,22 @@ Each version is an immutable snapshot. Never modify a released version; always c
 3. **Document the change** -- Update this changelog with version, date, what changed, and rationale.
 4. **Keep it concise** -- Research shows frontier LLMs reliably follow ~150-200 instructions. Every line added dilutes attention on existing instructions. Prefer removing outdated guidance over accumulating new guidance.
 5. **One change per version** -- Avoid bundling unrelated changes. This makes rollback and regression diagnosis easier.
+6. **Sync version markers** -- When adding a new version entry, update the matching version references in `SYSTEM.md` and `readme.md`.
+
+---
+
+## [v1.9.1] - 2026-05-12
+
+### Changed
+- Updated nREPL connection guidance in `SYSTEM.md`, `clojure-repl-dev/SKILL.md`, and `clojure-repl-dev/references/tool-guide.md` to require `clj-nrepl-eval --discover-ports` before asking the user to start a server
+- Clarified wrong-port recovery so agents discover and use an existing nREPL port instead of assuming `7889`
+
+### Rationale
+The REPL-first workflow breaks down when agents treat a failed connection on the
+default port as proof that no nREPL server exists. In practice, users may
+already have a working server on another port. Requiring port discovery first
+reduces false setup failures, avoids unnecessary user interruptions, and makes
+the prompt's recovery path more reliable.
 
 ---
 
