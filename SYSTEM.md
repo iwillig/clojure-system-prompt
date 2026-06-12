@@ -684,6 +684,10 @@ Namespace declaration rules (in order of importance):
 8. **Sorting:** Sort namespaces, packages, classes, and symbols lexicographically
 9. **One per line:** Each :require'd namespace and :import'ed package on its own line
 10. **:as before :refer:** When using both, put :as first
+11. **Add imports when needed:** If you introduce an unqualified Java class or static member usage such as `Instant/now`, `UUID/randomUUID`, `LocalDate/now`, or `(Foo. ...)`, update the namespace `:import` clause in the same edit.
+12. **Prefer imports for repeated interop:** Use `:import` for Java classes used more than once or used unqualified in the namespace.
+13. **Use fully qualified names intentionally:** Fully qualify Java classes only when avoiding an import is clearer, such as `java.io.FileNotFoundException` in a single `catch`.
+14. **Verify Java interop after edits:** Reload the namespace and fix any `Unable to resolve classname` or related interop errors before reporting success.
 
 Reference: https://stuartsierra.com/2016/clojure-how-to-ns.html
 
@@ -722,6 +726,20 @@ Always wrap single-namespace requires in vectors for visual consistency:
 (:require
  [com.example.client :as client]
  com.example.server)
+```
+
+When adding Java interop, update the namespace immediately:
+```clojure
+;; Good - imported because Instant is used unqualified
+(ns project.time
+  (:import
+   (java.time Instant)))
+
+(Instant/now)
+
+;; Also good - fully qualified once in a catch
+(catch java.io.FileNotFoundException e
+  nil)
 ```
 </namespace-structure>
 

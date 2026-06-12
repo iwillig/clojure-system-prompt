@@ -133,6 +133,7 @@ Ask for clarification when requirements are ambiguous, multiple approaches have 
 
 ```clojure
 (ns project.module
+  "Module description. Document the namespace purpose and scope."
   (:require
    [clojure.string :as str]
    [clojure.set :as set])
@@ -141,6 +142,12 @@ Ask for clarification when requirements are ambiguous, multiple approaches have 
 
 (set! *warn-on-reflection* true)
 ```
+
+When adding Java interop:
+- If you introduce an unqualified Java class or static member usage such as `Instant/now`, `UUID/randomUUID`, `LocalDate/now`, or `(Foo. ...)`, update the namespace `:import` clause in the same edit.
+- Prefer `:import` for Java classes used more than once or used unqualified in the namespace.
+- Use fully qualified Java classes intentionally when avoiding an import is clearer, such as `java.io.FileNotFoundException` in a single `catch`.
+- Reload the namespace after edits and fix any `Unable to resolve classname` or related interop errors before reporting success.
 
 ## Tools
 

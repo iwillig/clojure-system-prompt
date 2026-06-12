@@ -1,0 +1,41 @@
+{:deps true
+ :builds
+ {:evals
+  {:target :esm
+   :runtime :node
+   :output-dir "out/cljs"
+   :js-options {:js-provider :import}
+   :modules
+   {:shared
+    {:entries [clojure-system-prompt.evals.core
+               clojure-system-prompt.evals.harness]}
+    :java-imports.test
+    {:entries [clojure-system-prompt.evals.java-imports]
+     :depends-on #{:shared}}
+    :ns-conventions.test
+    {:entries [clojure-system-prompt.evals.ns-conventions]
+     :depends-on #{:shared}}
+    :namespace-rules.test
+    {:entries [clojure-system-prompt.evals.namespace-rules]
+     :depends-on #{:shared}}
+    :idioms.test
+    {:entries [clojure-system-prompt.evals.idioms]
+     :depends-on #{:shared}}
+    :control-flow.test
+    {:entries [clojure-system-prompt.evals.control-flow]
+     :depends-on #{:shared}}
+    :public-docstrings.test
+    {:entries [clojure-system-prompt.evals.public-docstrings]
+     :depends-on #{:shared}}
+    :data-patterns.test
+    {:entries [clojure-system-prompt.evals.data-patterns]
+     :depends-on #{:shared}}
+    :error-handling.test
+    {:entries [clojure-system-prompt.evals.error-handling]
+     :depends-on #{:shared}}
+    :clj-paren-repair.test
+    {:entries [clojure-system-prompt.evals.clj-paren-repair]
+     :depends-on #{:shared}}
+    :naming-conventions.test
+    {:entries [clojure-system-prompt.evals.naming-conventions]
+     :depends-on #{:shared}}}}}}
