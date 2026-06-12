@@ -118,6 +118,92 @@ cp -r clojure-repl-dev .pi/skills/
 pi --skill /path/to/clojure-repl-dev
 ```
 
+### Prompt evals with llama-server
+
+This repository includes a `vitest-evals` suite for checking how
+`SYSTEM.md` influences generated Clojure code. The local eval harness
+calls a running `llama-server` directly instead of using OpenAI or
+Anthropic providers.
+
+#### Local setup
+
+Start `llama-server` with an OpenAI-compatible API on port `8080`.
+The eval suite expects:
+
+- `LLAMA_SERVER_BASE_URL=http://127.0.0.1:8080/v1`
+- `LLAMA_SERVER_MODEL=unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL`
+
+If your server requires auth, also set:
+
+- `LLAMA_SERVER_API_KEY=...`
+
+Example launch command:
+
+```bash
+llama-server \
+  -hf unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL \
+  --host 127.0.0.1 \
+  --port 8080
+```
+
+This serves the model under the same identifier used by
+`LLAMA_SERVER_MODEL`.
+
+Install the Node dependencies:
+
+```bash
+npm install
+```
+
+Run the eval suite:
+
+```bash
+npm run evals
+```
+
+Generate JSON output for the local report UI or CI artifacts:
+
+```bash
+npm run evals:json
+```
+
+Open the local report UI after generating `vitest-results.json`:
+
+```bash
+npm run evals:ui
+```
+
+Override the default server or model for one run:
+
+```bash
+LLAMA_SERVER_BASE_URL=http://127.0.0.1:8080/v1 \
+LLAMA_SERVER_MODEL=unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL \
+  npm run evals
+```
+
+#### What the evals cover
+
+The current suites check prompt-sensitive Clojure behaviors such as:
+
+- Java `:import` decisions for unqualified class usage
+- Namespace docstrings
+- Avoiding `!` suffixes on Clojure function names
+
+#### CI configuration
+
+GitHub Actions will run the evals only when these repository variables
+are configured for a reachable llama-server endpoint:
+
+- `LLAMA_SERVER_BASE_URL`
+- `LLAMA_SERVER_MODEL`
+
+If your endpoint requires auth, add this secret:
+
+- `LLAMA_SERVER_API_KEY`
+
+When those variables are absent, the normal Clojure CI still runs and
+prompt evals are skipped.
+
 ## What This Prompt Provides
 
 - **REPL-first enforcement**: Code is tested in the REPL before being written to files

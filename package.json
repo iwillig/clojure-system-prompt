@@ -1,0 +1,17 @@
+{
+  "name": "clojure-system-prompt-evals",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "evals:build": "shadow-cljs compile evals",
+    "evals:watch": "shadow-cljs watch evals",
+    "evals": "npm run evals:build && vitest run --dir out/cljs --testTimeout 120000",
+    "evals:json": "npm run evals:build && vitest run --dir out/cljs --testTimeout 120000 --reporter=vitest-evals/reporter --reporter=json --outputFile.json=vitest-results.json",
+    "evals:ui": "vitest-evals serve vitest-results.json"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^3.4.11",
+    "vitest": "^4.1.8",
+    "vitest-evals": "^0.12.0"
+  }
+}
